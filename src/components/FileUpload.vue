@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col">
+  <div class="flex flex-col gap-5">
     <div class="flex flex-col">
       <span class="mb-1 font-bold text-lg uppercase">Upload File</span>
       <div
@@ -23,11 +23,20 @@
         characters</span
       >
     </div>
+
+    <ListDisplay
+      :items="listOfFiles"
+      :len="listOfFiles.length"
+      :maxFileSize="maxFileSize"
+      :removeItem="removeItem"
+    />
   </div>
 </template>
 
 <script>
 import Icon from "./icons/IconFileUpload.vue";
+import ListDisplay from "./ListDisplay.vue";
+import { isGreaterThanMaxLimitMB } from "../lib/helper";
 
 export default {
   data() {
@@ -38,20 +47,26 @@ export default {
   },
   methods: {
     onchangeHandler(target, files) {
-      console.log(files);
       const filesLength = files.length;
       for (let i = 0; i < filesLength; i++) {
         const data = {};
         data.name = files[i]?.name;
         data.size = files[i]?.size;
         data.type = files[i]?.type;
+        data.maxSizeError = isGreaterThanMaxLimitMB(files[i]?.size);
         this.listOfFiles.push(data);
+        console.log(data);
       }
       target.value = null;
     },
+    removeItem(index) {
+      this.listOfFiles.splice(index, 1);
+    },
+    isGreaterThanMaxLimitMB: isGreaterThanMaxLimitMB,
   },
   components: {
     Icon,
+    ListDisplay,
   },
 };
 </script>
